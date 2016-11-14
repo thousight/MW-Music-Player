@@ -4,33 +4,68 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/colorPrimary"
     android:orientation="vertical"
     tools:context="com.example.minb.programmingassignment2hint.MainActivity">
 
     <ListView
         android:id="@+id/listViewMP3"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:background="#99ceea" >
-    </ListView>
+        android:layout_height="350dp"
+        android:background="@drawable/listview_background"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center">
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/playPauseButton"/>
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:id="@+id/playPauseButton"
+            android:background="@drawable/gradient"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"/>
+
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="stop"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:id="@+id/stopButton"
-            android:layout_alignParentRight="true"/>
+            android:background="@drawable/gradient"
+            tools:ignore="RelativeOverlap"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/playPauseButton"
+            android:layout_toEndOf="@+id/playPauseButton"
+            android:layout_marginLeft="30dp"
+            android:layout_marginStart="30dp"
+            android:drawableStart="@drawable/ic_stop_white_48px"
+            android:drawableLeft="@drawable/ic_stop_white_48px"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            />
     </RelativeLayout>
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBar"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/musicTime"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:gravity="center"
+        android:textColor="@color/colorListViewBackground"/>
 
 </LinearLayout>
