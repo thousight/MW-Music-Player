@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">MW Music Player</string>
     <string name="stop">stop</string>
+    <string name="provide_permission">Provide Permission</string>
+    <string name="Permission_explanation">You must give this app read permission to your sdcard so that it can function. Don\'t worry, we are not gonna do anything to your device.</string>
 </resources>

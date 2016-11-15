@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -34,12 +33,18 @@ public class MainActivity extends AppCompatActivity {
     MediaPlayer music;
     TextView musicTime;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setElevation(0);
         setTitle("MW Music Player");
+        final boolean hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+
+        if (!hasPermission) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
 
         mp3List = new ArrayList<>();
         playPauseButon = (Button) findViewById(R.id.playPauseButton);
@@ -50,11 +55,6 @@ public class MainActivity extends AppCompatActivity {
 
         File[] listFiles = new File("sdcard/Music").listFiles();
         String fileName, extName;
-
-        // Check permission, if not request it
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        }
 
         if (listFiles == null) {
             listFiles = new File[0];
@@ -76,32 +76,34 @@ public class MainActivity extends AppCompatActivity {
         listViewMP3.setItemChecked(0, true);
 
         // Set initially selected music
-        music = MediaPlayer.create(getApplicationContext(), Uri.parse(getExternalStorageDirectory().getPath()+ "/Music/" + mp3List.get(0)));
 
-        listViewMP3
-                .setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> arg0, View arg1,
-                                            int arg2, long arg3) {
+        listViewMP3.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                         music.stop();
                         selectedMP3 = mp3List.get(arg2);
                         music = MediaPlayer.create(getApplicationContext(), Uri.parse(getExternalStorageDirectory().getPath()+ "/Music/" + selectedMP3));
                         music.setLooping(true);
                         seekBar.setMax(music.getDuration());
-                        updateTextProgress();
                         playMusic();
                     }
                 });
         if (mp3List.size() > 0) {
+            music = MediaPlayer.create(getApplicationContext(), Uri.parse(getExternalStorageDirectory().getPath()+ "/Music/" + mp3List.get(0)));
             selectedMP3 = mp3List.get(0);
+            updateTextProgress();
         }
 
         playPauseButon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (music.isPlaying()){
-                    pauseMusic();
+                if (hasPermission) {
+                    if (music.isPlaying()){
+                        pauseMusic();
+                    } else {
+                        playMusic();
+                    }
                 } else {
-                    playMusic();
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
                 }
             }
         });
@@ -109,20 +111,23 @@ public class MainActivity extends AppCompatActivity {
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                music.stop();
-                try {
-                    music.prepare();
-                } catch (IllegalStateException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                if (hasPermission) {
+                    music.stop();
+                    try {
+                        music.prepare();
+                    } catch (IllegalStateException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    music.seekTo(0);
+                    seekBar.setProgress(0);
+                    playPauseButon.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_play_arrow_white_48px, 0, 0, 0);
+                } else {
+                    ActivityCompat.requestPermissions(getParent(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
                 }
-                music.seekTo(0);
-                seekBar.setProgress(0);
-                updateTextProgress();
-                playPauseButon.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_play_arrow_white_48px, 0, 0, 0);
             }
         });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -145,14 +150,6 @@ public class MainActivity extends AppCompatActivity {
                     music.seekTo(progress);
             }
         });
-
-        updateTextProgress();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
     }
 
     public void Thread(){
@@ -185,14 +182,12 @@ public class MainActivity extends AppCompatActivity {
         music.setLooping(true);
         seekBar.setMax(music.getDuration());
         Thread();
-        updateTextProgress();
         playPauseButon.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pause_white_48px, 0, 0, 0);
     }
 
     public void pauseMusic() {
         music.pause();
         Thread();
-        updateTextProgress();
         playPauseButon.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_play_arrow_white_48px, 0, 0, 0);
     }
 
